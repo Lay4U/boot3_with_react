@@ -8,6 +8,7 @@ import com.example.webdev101.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,8 @@ public class UserController {
 
     private final TokenProvider tokenProvider;
 
+    private final PasswordEncoder passwordEncoder;
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO){
         try{
@@ -31,7 +34,7 @@ public class UserController {
             }
             UserEntity user = UserEntity.builder()
                     .username(userDTO.getUsername())
-                    .password(userDTO.getPassword())
+                    .password(passwordEncoder.encode(userDTO.getPassword()))
                     .build();
             UserEntity registeredUser = userService.create(user);
             UserDTO responseUserDTO = UserDTO.builder()
@@ -49,7 +52,8 @@ public class UserController {
     public ResponseEntity<?> authenticate(@RequestBody UserDTO userDTO){
         UserEntity user = userService.getByCredentials(
                 userDTO.getUsername(),
-                userDTO.getPassword()
+                userDTO.getPassword(),
+                passwordEncoder
         );
         if(user != null){
             String token = tokenProvider.create(user);
