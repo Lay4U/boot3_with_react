@@ -20,9 +20,10 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors();
         http.authorizeHttpRequests((auth) -> auth
                 .requestMatchers("/", "/auth/**").permitAll()
-                .anyRequest().permitAll());
+                .anyRequest().authenticated());
         http.httpBasic().disable();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
