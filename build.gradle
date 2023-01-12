@@ -28,6 +28,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    runtimeOnly 'mysql:mysql-connector-java'
 
 // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -36,4 +37,23 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+task('release'){
+    dependsOn('build')
+
+    doLast {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'eb', 'setenv', 'SPRING_PROFILES_ACTIVE=prod'
+            standardOutput = stdout
+        }
+        prinln "eb setevnt SPRING_PROFILES_ACTIVE=rod :\nstdout"
+        exec {
+            commandLine 'eb', 'deploy'
+            standardOutput = stdout
+        }
+        println "eb deploy :\n$stdout"
+        println "Release succeeded."
+    }
 }
